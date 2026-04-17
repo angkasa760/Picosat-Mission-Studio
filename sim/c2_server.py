@@ -190,7 +190,21 @@ def command_evade():
     return jsonify({"status": "EVASION SEQUENCE INITIATED", "offset": 5.0})
 
 if __name__ == '__main__':
+    ports = [4372, 8080, 8888, 9000]
+    success = False
+    
     print("STARTING GOD MODE C2 SERVER...")
     threading.Thread(target=generate_sstv, daemon=True).start()
     threading.Thread(target=physics_engine_loop, daemon=True).start()
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    
+    for port in ports:
+        try:
+            print(f"Attempting to bind to port {port}...")
+            app.run(host='0.0.0.0', port=port, threaded=True)
+            success = True
+            break
+        except Exception as e:
+            print(f"Port {port} failed: {e}")
+            
+    if not success:
+        print("CRITICAL: ALL PORTS BLOCKED. Please check your Firewall or Hyper-V settings.")
