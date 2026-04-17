@@ -36,6 +36,14 @@ function pollLiveTelemetry() {
             if (batteryEl) {
                 batteryEl.innerText = `SoC: ${data.battery_soc}%`;
             }
+
+            // EPS & ADCS Grid Sync
+            if(document.getElementById('eps-gen')) {
+                document.getElementById('eps-gen').innerText = `${data.eps_gen_w !== undefined ? data.eps_gen_w.toFixed(2) : '--'} W`;
+                document.getElementById('eps-load').innerText = `${data.eps_load_w !== undefined ? data.eps_load_w.toFixed(2) : '--'} W`;
+                document.getElementById('adcs-spin').innerText = `${data.tumbling_rate_rpm !== undefined ? data.tumbling_rate_rpm.toFixed(1) : '--'} RPM`;
+                document.getElementById('adcs-fading').innerText = `${data.spin_fading_db !== undefined ? data.spin_fading_db.toFixed(2) : '--'} dB`;
+            }
         });
 }
 

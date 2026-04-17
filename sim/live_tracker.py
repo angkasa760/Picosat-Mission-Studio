@@ -105,20 +105,34 @@ def run_live_tracker():
             geocentric = satellite.at(t)
             subpoint = geocentric.subpoint()
             
+            # ADCS Tumbling
+            spin_fading_db = 0.0
+            tumbling_rate_rpm = 5.0 # Rotasi 5 RPM
+            
             # Link Budget
             diff = (satellite - jakarta).at(t)
             dist_km, alt_deg = diff.distance().km, diff.altaz()[0].degrees
             
             margin = -99.9
+            eps_load_w = 0.8 # Idle Load
             if alt_deg > 0:
+                eps_load_w = 2.0 # Tx Load saat terlihat
                 fspl = calculate_fspl(dist_km * 1000, f_hz)
                 rain_loss = weather['precip'] * 0.5
                 iono_loss = max(0, (k_index - 4) * 1.5) if k_index > 4 else 0.5
-                margin = (20.0 + g_tx - fspl + 12.0 - rain_loss - iono_loss) - (-137.0)
+                
+                # Efek Spin Fading (Polarization Loss) berdasar rotasi waktu nyata
+                spin_phase = (now % 60.0) / 60.0 * 2 * math.pi * tumbling_rate_rpm
+                spin_fading_db = -25.0 * (1.0 - abs(math.cos(spin_phase)))
+                
+                margin = (20.0 + g_tx - fspl + 12.0 - rain_loss - iono_loss + spin_fading_db) - (-137.0)
             
-            # Power
+            # Power (EPS) System
             is_sunlit = geocentric.is_sunlit(planets)
-            battery_soc = min(100.0, battery_soc + (1.2 if is_sunlit else -0.5) * (10/60.0))
+            eps_gen_w = 1.5 if is_sunlit else 0.0
+            eps_net_w = eps_gen_w - eps_load_w
+            # Kapasitas baterai ~ 10 Wh. Perubahan Soc per 10 detik.
+            battery_soc = max(0.0, min(100.0, battery_soc + (eps_net_w / 10.0 * 100.0 * (10.0/3600.0))))
             
             # History for KML
             path_history.append((subpoint.latitude.degrees, subpoint.longitude.degrees, subpoint.elevation.km))
@@ -143,6 +157,8 @@ def run_live_tracker():
                 "alt": round(subpoint.elevation.km, 2), "is_sunlit": bool(is_sunlit), "battery_soc": round(battery_soc, 2),
                 "live_link_margin": round(margin, 2), "weather": weather, "k_index": k_index,
                 "next_pass": next_pass, "alt_deg": round(alt_deg, 2),
+                "eps_gen_w": eps_gen_w, "eps_load_w": eps_load_w,
+                "spin_fading_db": round(spin_fading_db, 2), "tumbling_rate_rpm": tumbling_rate_rpm,
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             with open(LIVE_COORDS_PATH, 'w') as f: json.dump(data, f)

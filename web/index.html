@@ -81,6 +81,27 @@
                 <div class="res-item">Received Power: <span id="rx-power">-106.2 dBm</span></div>
                 <div class="res-item">Link Margin: <span id="margin" class="green-text">+30.8 dB</span></div>
             </div>
+        <!-- Section 5: Space Environment (EPS & ADCS) -->
+        <section class="card stats-card">
+            <h2>Spacecraft Telemetry (EPS & ADCS)</h2>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <label>Solar Array Gen</label>
+                    <span class="value" id="eps-gen">-- W</span>
+                </div>
+                <div class="stat-item">
+                    <label>System Load</label>
+                    <span class="value" id="eps-load">-- W</span>
+                </div>
+                <div class="stat-item">
+                    <label>Tumbling Rate</label>
+                    <span class="value" id="adcs-spin">-- RPM</span>
+                </div>
+                <div class="stat-item">
+                    <label>Spin Fading</label>
+                    <span class="value" id="adcs-fading" style="color: #ff5252; text-shadow: 0 0 10px rgba(255,0,0,0.5);">-- dB</span>
+                </div>
+            </div>
         </section>
     </main>
 
