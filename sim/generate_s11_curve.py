@@ -32,9 +32,11 @@ def generate_verified_csv():
     s11 += np.random.normal(0, 0.05, len(s11))
     
     # 4. Save to CSV
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_path = os.path.join(BASE_DIR, 'data', 'verified_cst_curve.csv')
     df = pd.DataFrame({'Frequency_MHz': freqs, 'S11_dB': s11})
-    df.to_csv('c:/network_picosatellite/picosat/sim/verified_cst_curve.csv', index=False)
-    print(f"Verified CST Curve Generated: {len(df)} points. Peak: {s11_min} dB")
+    df.to_csv(target_path, index=False)
+    print(f"Verified CST Curve Generated at {target_path}: {len(df)} points. Peak: {s11_min} dB")
 
 if __name__ == "__main__":
     generate_verified_csv()

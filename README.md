@@ -10,6 +10,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)
+![Repo Size](https://img.shields.io/github/repo-size/angkasa760/Picosat-Mission-Studio)
+![Last Commit](https://img.shields.io/github/last-commit/angkasa760/Picosat-Mission-Studio)
 ![Status](https://img.shields.io/badge/Status-Operational-brightgreen.svg)
 ![Telemetry](https://img.shields.io/badge/Telemetry-Real--Time-orange.svg)
 
@@ -17,7 +19,7 @@
 
 Sistem simulasi dan pelacakan satelit picosatellite (UHF 437.2 MHz) berbasis Python Flask & Three.js. Proyek ini menggabungkan mekanika orbital konstelasi tingkat lanjut dengan sistem komando dua-arah (C2).
 
-**Developer:** angkasa760 | **Status:** 🟢 MISSION CONTROL ONLINE | **Version:** 2.0 (GOD MODE)
+**Developer:** angkasa760 | **Status:** 🟢 MISSION CONTROL ONLINE | **Version:** 2.5 (Professional Polish)
 
 ---
 
@@ -68,7 +70,21 @@ Menggunakan **MLP Regressor (Multi-Layer Perceptron)** untuk memprediksi panjang
 ## 📄 Informasi Dokumen
 Sistem ini dirancang untuk mendukung operasional Ground Station picosatellite dengan akurasi tinggi. Menggunakan TLE riil dari Celestrak, model atmosfer ITU-R, dan visualisasi 3D real-time yang tersinkronisasi.
 
-## 🏗️ Arsitektur Sistem
+## 🏗️ Arsitektur Proyek & Folder
+
+```text
+.
+├── .github/          # CI/CD Workflows & Issue Templates
+├── data/             # Datasets (CST Data), Ephemeris (BSP), & CSV
+├── docs/             # Laporan Teknis (DOCX/PDF) & Media Assets
+├── models/           # Bobot Model AI (Scikit-Learn)
+├── plots/            # Hasil Visualisasi Teknis (PNG/GIF)
+├── sim/              # Mesin Fisika & Flask C2 Server (Backend)
+├── web/              # Three.js Frontend & Mission HUD
+├── GAS_REKAMAN.bat   # Startup Otomatis (Master Entry)
+└── requirements.txt  # Daftar Dependensi Python
+```
+
 - **Backend (Python 3.12)**: Mesin perhitungan fisika, tracker posisi, dan pass predictor.
 - **Frontend (Three.js/Vanilla JS)**: Dashboard visualisasi 3D dan HUD operasional.
 - **AI Core (Scikit-Learn)**: Model prediksi optimasi antena CST.
