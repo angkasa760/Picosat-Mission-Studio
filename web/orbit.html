@@ -170,17 +170,28 @@
     addLog("PHASE 35: GOOGLE EARTH INTEGRATION READY");
 
     let realLat = 0, realLon = 0, realAlt = 400, realElev = -90;
+    
+    // Multi-Satellite Clones
+    const satGroup2 = satGroup.clone(); scene.add(satGroup2);
+    const satGroup3 = satGroup.clone(); scene.add(satGroup3);
+    let rLat2 = 0, rLon2 = 0, rAlt2 = 400;
+    let rLat3 = 0, rLon3 = 0, rAlt3 = 400;
+
     async function syncRealData() {
         try {
-            const r = await fetch('./live_coords.json');
-            const data = await r.json();
+            const r = await fetch('/telemetry');
+            const fullData = await r.json();
+            const data = fullData.constellation[0];
+            
             realLat = data.lat; realLon = data.lon; realAlt = data.alt; realElev = data.alt_deg;
+            if(fullData.constellation.length > 1) { rLat2 = fullData.constellation[1].lat; rLon2 = fullData.constellation[1].lon; rAlt2 = fullData.constellation[1].alt; }
+            if(fullData.constellation.length > 2) { rLat3 = fullData.constellation[2].lat; rLon3 = fullData.constellation[2].lon; rAlt3 = fullData.constellation[2].alt; }
             
             document.getElementById('margin-val').innerText = data.live_link_margin + " dB";
-            document.getElementById('env-weather').innerText = data.weather.desc.toUpperCase();
-            document.getElementById('env-precip').innerText = data.weather.precip + " MM/H";
-            document.getElementById('env-kp').innerText = data.k_index.toFixed(1);
-            document.getElementById('val-next-pass').innerText = data.next_pass;
+            document.getElementById('env-weather').innerText = fullData.weather.desc.toUpperCase();
+            document.getElementById('env-precip').innerText = fullData.weather.precip + " MM/H";
+            document.getElementById('env-kp').innerText = fullData.k_index.toFixed(1);
+            document.getElementById('val-next-pass').innerText = fullData.next_pass;
             document.getElementById('alt-val').innerText = data.alt.toFixed(1) + " KM";
             document.getElementById('elev-val').innerText = data.alt_deg.toFixed(1) + "°";
             
@@ -192,8 +203,8 @@
                 beam.visible = false;
             }
 
-            if(data.weather.precip > 5 || data.k_index > 5) {
-                document.getElementById('status-val').innerText = "CAUTION: ENV"; document.getElementById('status-val').style.color = "#ff3333";
+            if(fullData.weather.precip > 5 || fullData.k_index > 5 || fullData.c2_status.includes("CME")) {
+                document.getElementById('status-val').innerText = fullData.c2_status; document.getElementById('status-val').style.color = "#ff3333";
             } else {
                 document.getElementById('status-val').innerText = "NOMINAL"; document.getElementById('status-val').style.color = "#00ff88";
             }
@@ -291,14 +302,16 @@
         const phi = (90 - realLat) * (Math.PI / 180);
         const theta = (realLon + 90) * (Math.PI / 180);
         const R = 100 + (realAlt / 6371) * 100; // Radius mapped to globe scale
-        
-        const targetPos = new THREE.Vector3(
-            -R * Math.sin(phi) * Math.cos(theta),
-            R * Math.cos(phi),
-            R * Math.sin(phi) * Math.sin(theta)
-        );
-        satGroup.position.lerp(targetPos, 0.05);
-        satGroup.rotation.y += 0.01;
+        const targetPos = new THREE.Vector3(-R * Math.sin(phi) * Math.cos(theta), R * Math.cos(phi), R * Math.sin(phi) * Math.sin(theta));
+        satGroup.position.lerp(targetPos, 0.05); satGroup.rotation.y += 0.01;
+
+        const p2 = (90 - rLat2)*(Math.PI/180), t2 = (rLon2 + 90)*(Math.PI/180), Rad2 = 100+(rAlt2/6371)*100;
+        satGroup2.position.lerp(new THREE.Vector3(-Rad2*Math.sin(p2)*Math.cos(t2), Rad2*Math.cos(p2), Rad2*Math.sin(p2)*Math.sin(t2)), 0.05);
+        satGroup2.rotation.y += 0.01;
+
+        const p3 = (90 - rLat3)*(Math.PI/180), t3 = (rLon3 + 90)*(Math.PI/180), Rad3 = 100+(rAlt3/6371)*100;
+        satGroup3.position.lerp(new THREE.Vector3(-Rad3*Math.sin(p3)*Math.cos(t3), Rad3*Math.cos(p3), Rad3*Math.sin(p3)*Math.sin(t3)), 0.05);
+        satGroup3.rotation.y += 0.01;
 
         const batt = 100 - (tick % 10); document.getElementById('batt-val').innerText = Math.round(batt) + "%";
         document.getElementById('battery-fill').style.width = batt + "%";

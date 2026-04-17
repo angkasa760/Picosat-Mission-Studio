@@ -109,7 +109,35 @@
                 [Awaiting Up-Link Packets over Indonesia...]
             </div>
         </section>
+
+        <!-- Section 7: C2 Command Center -->
+        <section class="card stats-card" style="margin-top: 15px; border-color: #ff3333;">
+            <h2 style="color: #ff3333; text-shadow: 0 0 10px #ff3333;">GOD MODE: C2 BATTLE STATION</h2>
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <button onclick="fireEvade()" style="width:100%; height:50px; background:#ff0000; color:#fff; border:2px solid #fff; font-weight:bold; cursor:pointer; text-transform:uppercase;">🔥 Fire Evasion Thrusters</button>
+                    <div id="c2-status" style="margin-top: 15px; color: #ffd700; text-align: center; font-weight: bold; font-size: 18px; text-shadow: 0 0 10px #ffd700;">SERVER STATUS: CONNECTING...</div>
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <img id="sstv-cam" style="width: 150px; height: 100px; border: 2px solid #fff;" src="/sstv_latest.jpg" alt="No Signal">
+                    <div style="font-size: 10px; color: #00f2ff; margin-top: 5px; font-weight: bold;">LIVE SSTV CAM</div>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <script>
+        function fireEvade() {
+            fetch('/command/evade', {method: 'POST'})
+            .then(r => r.json())
+            .then(data => alert("SERVER ACK: " + data.status))
+            .catch(e => alert("ERROR: C2 SERVER UNREACHABLE"));
+        }
+        setInterval(() => {
+            const cam = document.getElementById('sstv-cam');
+            if(cam) cam.src = '/sstv_latest.jpg?t=' + new Date().getTime();
+        }, 10000);
+    </script>
 
     <footer>
         Powered by AntiGravity AI | Picosatellite UHF Turnstile Antenna Project - April 2026

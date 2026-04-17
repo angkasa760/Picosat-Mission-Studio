@@ -16,9 +16,14 @@ fetch('../mission_data.json')
 
 // 2. LIVE TELEMETRY LOOP (Physics from Tracker)
 function pollLiveTelemetry() {
-    fetch('live_coords.json')
+    fetch('/telemetry')
         .then(r => r.json())
-        .then(data => {
+        .then(fullData => {
+            const data = fullData.constellation[0];
+            
+            const c2Status = document.getElementById('c2-status');
+            if(c2Status) c2Status.innerText = "C2: " + fullData.c2_status;
+
             // Update UI Elements
             const marginEl = document.getElementById('margin');
             if (marginEl) {
