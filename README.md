@@ -8,11 +8,51 @@
 
 ---
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)
+![Status](https://img.shields.io/badge/Status-Operational-brightgreen.svg)
+![Telemetry](https://img.shields.io/badge/Telemetry-Real--Time-orange.svg)
+
 **High-Fidelity Orbital Simulation + Real-Time Telemetry Tracking System**
 
 Sistem simulasi dan pelacakan satelit picosatellite (UHF 437.2 MHz) berbasis Python & Three.js. Proyek ini menggabungkan mekanika orbital tingkat lanjut dengan optimasi RF berbasis AI.
 
 **Developer:** angkasa760 | **Status:** 🟢 OPERATIONAL & READY FOR MISSION | **Version:** 1.0 (Stable)
+
+---
+
+## 🖼️ Technical Simulation Gallery
+
+Lihat hasil analisis mendalam dari mesin simulasi ELITE kami:
+
+| **Link Budget Analysis** | **Orbital Thermal Analysis** |
+|:---:|:---:|
+| ![Link Budget](plots/academic_link_budget.png) | ![Thermal](plots/academic_thermal_analysis.png) |
+| *Analisis margin sinyal LEO ke Jakarta* | *Simulasi pergeseran resonansi akibat suhu* |
+
+| **AI Antenna Optimizer** | **RF Propagation Pattern** |
+|:---:|:---:|
+| ![AI Plot](plots/ai_antenna_optimizer.png) | ![RF GIF](plots/rf_propagation.gif) |
+| *Optimasi S11 menggunakan Neural Network* | *Visualisasi radiasi medan UHF* |
+
+---
+
+## 📚 Research Methodology & Physics
+
+Proyek ini menggunakan model matematika tingkat lanjut untuk menjamin akurasi data misi:
+
+### 1. Link Budget Engineering
+Menggunakan persamaan **Free Space Path Loss (FSPL)** yang dimodifikasi dengan kerugian atmosfer menurut standar **ITU-R**:
+$$L_{FSPL} = 20 \log_{10}(d) + 20 \log_{10}(f) - 147.55$$
+*Dimana $d$ adalah slant range real-time dan $f$ adalah frekuensi operasional 437.2 MHz.*
+
+### 2. Thermal Resonance Modeling
+Mekanisme pergeseran frekuensi antena akibat pemuaian termal dihitung menggunakan model **2-Node Lumped Parameter**:
+- **Internal Node**: Panas dari batere & CPU picosat.
+- **External Node**: Paparan radiasi matahari (Solar Irradiance).
+
+### 3. AI-Powered S11 Optimization
+Menggunakan **MLP Regressor (Multi-Layer Perceptron)** untuk memprediksi panjang lengan antena yang optimal demi mencapai VSWR < 1.5 secara dinamis berdasarkan dataset simulasi CST Microwave Studio.
 
 ---
 
