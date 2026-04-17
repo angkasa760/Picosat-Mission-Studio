@@ -13,11 +13,11 @@
 ![Status](https://img.shields.io/badge/Status-Operational-brightgreen.svg)
 ![Telemetry](https://img.shields.io/badge/Telemetry-Real--Time-orange.svg)
 
-**High-Fidelity Orbital Simulation + Real-Time Telemetry Tracking System**
+**High-Fidelity Orbital Simulation + C2 Command Center (GOD MODE)**
 
-Sistem simulasi dan pelacakan satelit picosatellite (UHF 437.2 MHz) berbasis Python & Three.js. Proyek ini menggabungkan mekanika orbital tingkat lanjut dengan optimasi RF berbasis AI.
+Sistem simulasi dan pelacakan satelit picosatellite (UHF 437.2 MHz) berbasis Python Flask & Three.js. Proyek ini menggabungkan mekanika orbital konstelasi tingkat lanjut dengan sistem komando dua-arah (C2).
 
-**Developer:** angkasa760 | **Status:** 🟢 OPERATIONAL & READY FOR MISSION | **Version:** 1.0 (Stable)
+**Developer:** angkasa760 | **Status:** 🟢 MISSION CONTROL ONLINE | **Version:** 2.0 (GOD MODE)
 
 ---
 
@@ -80,6 +80,10 @@ Sistem ini dirancang untuk mendukung operasional Ground Station picosatellite de
 - 🧊 **3D Orbiter HUD**: Visualisasi lintasan satelit di ruang angkasa menggunakan Three.js.
 - 🧠 **Antenna AI Optimizer**: Prediksi pergeseran resonansi berdasarkan panjang lengan antena.
 - 🌡️ **Orbital Thermal Analysis**: Simulasi suhu internal/eksternal satelit selama siklus orbit LEO.
+- 🔗 **Bi-Directional C2 Server**: Sistem komando dua-arah menggunakan Flask untuk mengontrol manuver satelit secara remote.
+- 🌌 **Multi-Satellite Constellation**: Pelacakan sinkron untuk 3 satelit sekaligus dalam satu layar radar.
+- 📸 **SSTV Camera Simulation**: Dekode gambar simulasi "Slow Scan TV" dari kamera onboard satelit.
+- 🌋 **CME Solar Flare Event**: Simulasi kiamat badai matahari yang mempengaruhi keandalan EPS & Link Margin.
 - 📊 **Mission Reliability**: Simulasi Monte Carlo untuk probabilitas keberhasilan misi.
 
 ## 🚀 Cara Menjalankan Sistem
@@ -89,14 +93,14 @@ Pastikan Python sudah terinstal, lalu pasang dependensi:
 pip install -r requirements.txt
 ```
 
-### 2. Menjalankan Mesin Utama (Engine)
-Gunakan skrip otomatis untuk memulai pelacakan dan prediksi lintasan:
-- Klik ganda file **`GAS_REKAMAN.bat`**
+### 2. Menjalankan Master C2 Server (GOD MODE)
+Sistem sekarang berjalan sebagai server terpusat. Gunakan skrip otomatis:
+- Klik ganda file **`GAS_REKAMAN.bat`** (Server akan mencoba port 4372 atau 8080 secara otomatis).
 
 ### 3. Memantau Ground Station
-Untuk tampilan visual, buka dashboard di browser:
-- Buka **`web/orbit.html`** (Visualisasi 3D)
-- Buka **`web/index.html`** (Data Telemetri 2D)
+Setelah server menyala, buka alamat berikut di browser:
+- **Dashboard & C2 Control**: `http://localhost:4372`
+- **3D Constellation Radar**: `http://localhost:4372/orbit.html`
 
 ### 4. Ground Control GUI
 Untuk menjalankan aplikasi Windows khusus Mission Control:
