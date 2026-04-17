@@ -27,7 +27,7 @@ Lihat hasil analisis mendalam dari mesin simulasi ELITE kami:
 
 | **Link Budget Analysis** | **Orbital Thermal Analysis** |
 |:---:|:---:|
-| ![Link Budget](plots/academic_link_budget.png) | ![Thermal](plots/academic_thermal_analysis.png) |
+| ![Link Budget](plots/link_budget_analysis.png) | ![Thermal](plots/thermal_analysis.png) |
 | *Analisis margin sinyal LEO ke Jakarta* | *Simulasi pergeseran resonansi akibat suhu* |
 
 | **AI Antenna Optimizer** | **RF Propagation Pattern** |
