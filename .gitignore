@@ -28,11 +28,11 @@ passes_jakarta.csv
 picosat_beacon.wav
 mission_path.kml
 
-# UI/Media Outputs (Optional to keep, but often excluded for clean code)
-*.png
-*.jpg
-*.jpeg
-*.gif
+# UI/Media Outputs (Diizinkan untuk kebutuhan Galeri Readme / Banner)
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
 
 # IDEs
 .vscode/
