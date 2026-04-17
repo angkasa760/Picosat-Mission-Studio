@@ -1,5 +1,11 @@
 import os
 
+"""
+PICOSAT MISSION STUDIO V1 - ELITE EDITION
+Author: Mohammad Fadlurahman Saeran
+Institution: Telkom University (Telecommunication Engineering)
+"""
+
 # --- BASE CONFIGURATION ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIM_DIR = os.path.join(BASE_DIR, 'sim')

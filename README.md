@@ -2,6 +2,12 @@
 
 ![Mission Hero Banner](docs/banner.png)
 
+**Author:** Mohammad Fadlurahman Saeran  
+**College:** Telkom University  
+**Major:** S1 Teknik Telekomunikasi  
+
+---
+
 **High-Fidelity Orbital Simulation + Real-Time Telemetry Tracking System**
 
 Sistem simulasi dan pelacakan satelit picosatellite (UHF 437.2 MHz) berbasis Python & Three.js. Proyek ini menggabungkan mekanika orbital tingkat lanjut dengan optimasi RF berbasis AI.
