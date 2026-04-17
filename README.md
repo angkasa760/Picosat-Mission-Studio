@@ -112,3 +112,51 @@ Dokumentasi hasil simulasi tersedia dalam bentuk plot grafis:
 
 ---
 *Maintained with ❤️ by angkasa760*
+
+---
+
+## 💻 Modul dan Skrip Utama (Deep Dive)
+
+Berikut adalah rincian fungsionalitas dari setiap komponen dalam Mission Studio ini:
+
+### 1. Core Simulation (`sim/`)
+- **`live_tracker.py`**: Mengambil data Two-Line Element (TLE) terbaru dari Celestrak dan menghitung posisi orbital satelit secara *real-time* menggunakan *Skyfield*. Menghasilkan jejak lintasan (ground track) untuk divisualisasikan.
+- **`link_budget.py`**: Skrip krusial untuk simulasi telekomunikasi ruang angkasa. Memperhitungkan daya pancar (EIRP), redaman ruang bebas (FSPL), redaman hujan, efek ionosfer, dan margin penerima untuk menjamin komunikasi *uplink* dan *downlink*.
+- **`antenna_ai.py`**: Model Machine Learning yang telah dilatih menggunakan ratusan sampel simulasi elektromagnetik (dari CST Microwave Studio) untuk memprediksi respon frekuensi antena dipole UHF. Solusi inovatif untuk mengatasi fenomena *detuning*.
+- **`mission_reliability.py`**: Simulasi probabilistik (metode Monte Carlo) untuk memprediksi angka harapan hidup dan tingkat rasio kesuksesan misi (Mission Success Rate) berdasarkan berbagai skenario kegagalan komponen di luar angkasa.
+- **`thermal_analysis.py`**: Menganalisis variasi suhu ekstrem ketika satelit berada dalam fase siklus *sunlit* (terpapar matahari) dan *eclipse* (tertutup bayangan bumi), serta efeknya terhadap komponen elektronika RF.
+- **`vna_interface.py`**: Simulator antarmuka Vector Network Analyzer (VNA) virtual untuk memonitor parameter *S-parameters* (terutama $S_{11}$) guna memastikan matching impedansi pada antena 50-ohm.
+
+### 2. Frontend Interface (`web/`)
+- Menerapkan arsitektur *dashboard* visual 3D yang dibangun menggunakan **Three.js**. Menampilkan posisi satelit dalam proyeksi globe 3D secara interaktif lengkap dengan garis ekuator dan bayangan terminator siang-malam Bumi.
+- Sinkronisasi data berbasis polling asinkron ke file status telemetri JSON (sebagai ganti pemanggilan API eksternal yang rawan limitasi). 
+
+---
+
+## 📡 Konsep Fundamental Telekomunikasi LEO (Low Earth Orbit)
+
+Proyek ini dibangun berdasarkan literatur akademik dan standar komunikasi satelit profesional.
+
+### A. Pola Radiasi Antena (Antenna Radiation Pattern)
+Satelit kelas picosatellite yang berputar tak beraturan (tumbling) di orbit memerlukan antena dengan polarisasi sirkular atau pola radiasi omnidireksional, seperti *Turnstile Antenna* atau Modifikasi Dipole. Hal ini mencegah hilangnya sinyal mutlak (*polarization mismatch loss*) saat antena Ground Station dan satelit tidak sejajar.
+
+### B. Propagasi Sinyal (Signal Propagation)
+Pada frekuensi pita UHF (mis: 437.2 MHz), atmosfer bumi cukup transparan, namun sinyal tetap dipengaruhi oleh:
+- **Faraday Rotation**: Pemutaran bidang polarisasi linear akibat medan magnetik bumi berinteraksi dengan ionosfer.
+- **Doppler Shift**: Perubahan frekuensi semu (*apparent frequency*) yang terasa di Ground Station akibat pergerakan satelit LEO yang sangat cepat (>7 km/s). Studio ini dikalibrasi untuk menangani pergeseran doppler hingga ±10 kHz.
+
+### C. S-Parameter ($S_{11}$) & VSWR
+Parameter $S_{11}$ (Return Loss) merepresentasikan seberapa banyak daya pantul gema (*reflected power*) akibat ketidakcocokan impedansi (*impedance mismatch*) antara transmitter dengan antena transmisi.
+Untuk komunikasi luar angkasa, disyaratkan target kinerja VSWR di bawah 1.5:1 (yang ekuivalen dinilai dari pantulan daya $\approx 4\%$, atau $S_{11} \approx -14\text{ dB}$).
+
+---
+
+## 🔮 Roadmap / Future Development
+
+Dalam iterasi pengembangan versi selanjutnya (V2.0), beberapa fitur yang direncanakan:
+1. **SDR (Software Defined Radio) Integration**: Integrasi antarmuka untuk dihubungkan langsung ke *hardware* RTL-SDR guna mendengarkan suar telemetri satelit rill.
+2. **QPSK Demodulation Module**: Pengenalan algoritma pemrosesan sinyal digital (*Digital Signal Processing*) untuk mendemodulasi sinyal AFSK atau QPSK.
+3. **Advanced Multi-Satellite Collision Avoidance**: Implementasi algoritma orbit prediktif untuk menghitung potensi jarak pendekatan terdekat antarsatelit (Close Approach Monitoring).
+
+---
+*Dikembangkan sebagai portofolio akademik untuk Program S1 Teknik Telekomunikasi, Telkom University.*
