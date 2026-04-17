@@ -229,13 +229,46 @@
     composer.addPass(new RenderPass(scene, mainCam));
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.4, 0.85));
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.5); scene.add(sunLight);
+    // 1. Milky Way Starfield
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 10000;
+    const starPos = new Float32Array(starCount * 3);
+    for(let i=0; i<starCount*3; i++) {
+        starPos[i] = (Math.random() - 0.5) * 4000;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({color: 0xffffff, size: 1.5, transparent: true, opacity: 0.8});
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+
+    // 2. The Sun
+    scene.add(new THREE.AmbientLight(0x0c1420, 0.4)); // Space ambient
+    const sunLight = new THREE.PointLight(0xffffee, 2.5, 10000);
+    scene.add(sunLight);
+    const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(80, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    scene.add(sunMesh);
+
+    // 3. The Moon
+    const moonMesh = new THREE.Mesh(new THREE.SphereGeometry(25, 64, 64), new THREE.MeshStandardMaterial({ 
+        map: texLoader.load('https://threejs.org/examples/textures/planets/moon_1024.jpg'), roughness: 1.0 
+    }));
+    scene.add(moonMesh);
 
     function animate() {
         requestAnimationFrame(animate); tick += 0.005;
         earthGroup.rotation.y += 0.0001;
-        sunLight.position.set(500 * Math.cos(tick*0.1), 200, 500 * Math.sin(tick*0.1));
+        
+        // Starfield slow rotation
+        stars.rotation.y += 0.00005;
+
+        // Sun positioning (Far away)
+        sunLight.position.set(2500 * Math.cos(tick*0.05), 100, 2500 * Math.sin(tick*0.05));
+        sunMesh.position.copy(sunLight.position);
+
+        // Moon Orbit
+        moonMesh.position.set(400 * Math.cos(tick*0.15), 50 * Math.sin(tick*0.1), 400 * Math.sin(tick*0.15));
+        moonMesh.rotation.y -= 0.001;
+
         const sunDir = sunLight.position.clone().normalize();
         const satNormal = satGroup.position.clone().normalize();
         const lightIntensity = Math.max(0, satNormal.dot(sunDir));
