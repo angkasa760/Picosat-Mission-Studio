@@ -160,3 +160,6 @@ Dalam iterasi pengembangan versi selanjutnya (V2.0), beberapa fitur yang direnca
 
 ---
 *Dikembangkan sebagai portofolio akademik untuk Program S1 Teknik Telekomunikasi, Telkom University.*
+
+<!-- GitHub Standard CI/CD -->
+[![CI Build Status](https://github.com/angkasa760/Picosat-Mission-Studio/actions/workflows/python-ci.yml/badge.svg)](https://github.com/angkasa760/Picosat-Mission-Studio/actions)
