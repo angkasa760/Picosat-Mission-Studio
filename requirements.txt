@@ -1,0 +1,9 @@
+skyfield
+pandas
+numpy
+matplotlib
+requests
+scikit-learn
+joblib
+customtkinter
+scipy

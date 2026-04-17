@@ -1,0 +1,16 @@
+{
+  "name": "Picosat Mission Control",
+  "short_name": "PicoMC",
+  "description": "Extreme Mission Control & Simulator for Picosat-UHF Antennas.",
+  "start_url": "/web/index.html",
+  "display": "standalone",
+  "background_color": "#0a0e14",
+  "theme_color": "#00f2ff",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/plasticine/100/satellite.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN-UHF Elite Mission Studio</title>
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.147.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: 'Roboto Mono', monospace; overflow: hidden; }
+        canvas { display: block; }
+        #hud { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border: 15px solid rgba(0, 242, 255, 0.05); z-index: 10; }
+        
+        #telemetry-left { position: absolute; bottom: 30px; left: 30px; background: rgba(5,15,25,0.85); padding: 20px; border-left: 3px solid #00f2ff; backdrop-filter: blur(10px); width: 240px; }
+        #telemetry-right { position: absolute; bottom: 30px; right: 30px; background: rgba(5,15,25,0.85); padding: 20px; border-right: 3px solid #ffd700; backdrop-filter: blur(10px); width: 240px; text-align: right; }
+        
+        .tel-label { font-size: 9px; color: #8892b0; margin-bottom: 2px; text-transform: uppercase; }
+        .tel-val { font-size: 16px; font-weight: bold; color: #00f2ff; margin-bottom: 10px; }
+        
+        #event-log { position: absolute; top: 30px; left: 30px; width: 300px; height: 150px; background: rgba(0,0,0,0.5); padding: 10px; font-size: 10px; overflow: hidden; color: #00ff88; pointer-events: none; }
+        .log-entry { margin-bottom: 4px; border-left: 2px solid #00ff88; padding-left: 5px; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        #env-hud { position: absolute; top: 200px; left: 30px; background: rgba(20,20,30,0.7); padding: 15px; border: 1px solid rgba(0,242,255,0.2); width: 200px; }
+        .env-item { font-size: 10px; margin-bottom: 5px; }
+        .env-tag { background: #00f2ff; color: #000; padding: 2px 4px; font-weight: bold; border-radius: 2px; margin-right: 5px; }
+
+        #controls { position: absolute; top: 30px; right: 30px; pointer-events: auto; display: flex; flex-direction: column; gap: 8px; }
+        .btn-group { display: flex; gap: 4px; }
+        button { background: #0a101a; color: #00f2ff; border: 1px solid #00f2ff; padding: 8px 12px; cursor: pointer; text-transform: uppercase; font-size: 10px; font-weight: bold; }
+        button:hover { background: #00f2ff; color: #000; box-shadow: 0 0 10px #00f2ff; }
+        button.active { background: #00f2ff; color: #000; }
+        
+        #record-indicator { color: #ff3333; font-size: 10px; font-weight: bold; display: none; text-align: right; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.2; } }
+
+        #hud-passes { position: absolute; top: 30px; left: 350px; background: rgba(5,15,25,0.7); border-top: 2px solid #00f2ff; padding: 10px; width: 200px; backdrop-filter: blur(5px); }
+        .pass-row { display: flex; justify-content: space-between; font-size: 10px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div id="event-log"></div>
+
+        <div id="hud-passes">
+            <div class="tel-label" style="color: #00ff88; margin-bottom: 5px;">NEXT PASS SHEDULE (JKT)</div>
+            <div id="pass-list">
+                <div class="pass-row"><span>UPCOMING:</span> <span id="val-next-pass" style="color: #00f2ff;">WAITING...</span></div>
+            </div>
+        </div>
+
+        <div id="env-hud">
+            <div class="tel-label" style="color: #ffd700; margin-bottom: 8px;">GROUND STATION ENV (JKT)</div>
+            <div class="env-item"><span class="env-tag">WX</span> <span id="env-weather">FETCHING...</span></div>
+            <div class="env-item"><span class="env-tag">RAIN</span> <span id="env-precip">0.0 MM/H</span></div>
+            <div class="env-item" style="margin-top: 10px;"><span class="env-tag" style="background: #ffd700;">KP</span> SOLAR FLUX: <span id="env-kp">2.0</span></div>
+        </div>
+        
+        <div id="telemetry-left">
+            <div class="tel-label">ALTITUDE (MSL)</div>
+            <div id="alt-val" class="tel-val">--- KM</div>
+            <div class="tel-label">ELEVATION (JKT)</div>
+            <div id="elev-val" class="tel-val">---°</div>
+            <div class="tel-label">LINK MARGIN (ADAPTIVE)</div>
+            <div id="margin-val" class="tel-val">--- dB</div>
+            <div class="tel-label">MISSION STATUS</div>
+            <div id="status-val" class="tel-val" style="color: #00ff88;">NOMINAL</div>
+        </div>
+
+        <div id="telemetry-right">
+            <div class="tel-label">DOPPLER SHIFT</div>
+            <div id="doppler-val" class="tel-val" style="color: #ffd700;">+2.45 kHz</div>
+            <div class="tel-label">BATTERY SOC</div>
+            <div id="batt-val" class="tel-val" style="color: #00ff88;">98%</div>
+            <div style="width: 100%; height: 4px; background: #1a2a3a; margin-top: 5px;"><div id="battery-fill" style="height: 100%; width: 100%; background: #00ff88;"></div></div>
+        </div>
+
+        <div id="controls">
+            <div class="btn-group">
+                <button onclick="switchView('global')" id="btn-global" class="active">Global</button>
+                <button onclick="switchView('follow')" id="btn-follow">Follow</button>
+                <button onclick="switchView('jakarta')" id="btn-jakarta">Jakarta</button>
+            </div>
+            <button onclick="window.open('../mission_path.kml')" style="background: #2e7d32; border-color: #4caf50;">Export Google Earth</button>
+            <button id="btn-deploy" style="border-color: #ffd700; color: #ffd700;">Sequence: Deploy</button>
+            <button id="btn-record">Master Record</button>
+            <div id="record-indicator">● LIVE STREAMING TO DISK</div>
+        </div>
+    </div>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const scene = new THREE.Scene();
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    document.body.appendChild(renderer.domElement);
+
+    const mainCam = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 20000);
+    mainCam.position.set(300, 150, 300);
+    const controls = new OrbitControls(mainCam, renderer.domElement);
+    controls.enableDamping = true;
+
+    const JAKARTA = new THREE.Vector3(100 * Math.cos(-6.2*(Math.PI/180)) * Math.cos(106.8*(Math.PI/180)), 100 * Math.sin(-6.2*(Math.PI/180)), 100 * Math.cos(-6.2*(Math.PI/180)) * Math.sin(106.8*(Math.PI/180)));
+    const F_REF = 437.2; const C = 299792.458;
+
+    const texLoader = new THREE.TextureLoader();
+    const earthGroup = new THREE.Group(); scene.add(earthGroup);
+    const earthGeo = new THREE.SphereGeometry(100, 128, 128);
+    const earthMat = new THREE.MeshStandardMaterial({ 
+        map: texLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
+        emissiveMap: texLoader.load('https://threejs.org/examples/textures/planets/earth_lights_2048.png'), 
+        emissive: new THREE.Color(0xffffff), emissiveIntensity: 0 
+    });
+    const earth = new THREE.Mesh(earthGeo, earthMat); earthGroup.add(earth);
+    const clouds = new THREE.Mesh(new THREE.SphereGeometry(101, 128, 128), new THREE.MeshStandardMaterial({ 
+        alphaMap: texLoader.load('https://unpkg.com/three@0.147.0/examples/textures/planets/earth_atmos_2048.jpg'), transparent: true, opacity: 0.3 
+    })); earthGroup.add(clouds);
+
+    const satGroup = new THREE.Group(); scene.add(satGroup);
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(7,7,7), new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.9, roughness: 0.1, emissive: 0x00f2ff, emissiveIntensity: 0.2 })); satGroup.add(chassis);
+    const arms = [];
+    for(let i=0; i<4; i++){
+        const pivot = new THREE.Group();
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 25), new THREE.MeshStandardMaterial({ color: 0xffd700 }));
+        arm.position.y = 12.5; pivot.add(arm); pivot.rotation.z = Math.PI/2; pivot.rotation.x = (i*Math.PI)/2;
+        satGroup.add(pivot); arms.push(pivot);
+    }
+
+    const waveGroup = new THREE.Group(); satGroup.add(waveGroup);
+    function createWave() {
+        if(!deploying) return;
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 16, 64), new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.8 }));
+        ring.rotation.x = Math.PI/2; waveGroup.add(ring);
+        gsap.to(ring.scale, { x: 70, y: 70, z: 70, duration: 2 });
+        gsap.to(ring.material, { opacity: 0, duration: 2, onComplete: () => { waveGroup.remove(ring); ring.geometry.dispose(); ring.material.dispose(); } });
+    }
+    setInterval(createWave, 400);
+
+    const beamGeo = new THREE.CylinderGeometry(0, 5, 200, 32, 1, true);
+    const beamMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+    const beam = new THREE.Mesh(beamGeo, beamMat); beam.rotation.x = Math.PI/2;
+    beam.position.y = -100; satGroup.add(beam); beam.visible = false;
+
+    function addLog(text) {
+        const log = document.getElementById('event-log');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry'; entry.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
+        log.prepend(entry); if(log.childNodes.length > 8) log.removeChild(log.lastChild);
+    }
+    addLog("PHASE 35: GOOGLE EARTH INTEGRATION READY");
+
+    let realLat = 0, realLon = 0, realAlt = 400, realElev = -90;
+    async function syncRealData() {
+        try {
+            const r = await fetch('./live_coords.json');
+            const data = await r.json();
+            realLat = data.lat; realLon = data.lon; realAlt = data.alt; realElev = data.alt_deg;
+            
+            document.getElementById('margin-val').innerText = data.live_link_margin + " dB";
+            document.getElementById('env-weather').innerText = data.weather.desc.toUpperCase();
+            document.getElementById('env-precip').innerText = data.weather.precip + " MM/H";
+            document.getElementById('env-kp').innerText = data.k_index.toFixed(1);
+            document.getElementById('val-next-pass').innerText = data.next_pass;
+            document.getElementById('alt-val').innerText = data.alt.toFixed(1) + " KM";
+            document.getElementById('elev-val').innerText = data.alt_deg.toFixed(1) + "°";
+            
+            if(data.alt_deg > 10) {
+                document.getElementById('hud').style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                beam.visible = true;
+            } else {
+                document.getElementById('hud').style.borderColor = 'rgba(0, 242, 255, 0.05)';
+                beam.visible = false;
+            }
+
+            if(data.weather.precip > 5 || data.k_index > 5) {
+                document.getElementById('status-val').innerText = "CAUTION: ENV"; document.getElementById('status-val').style.color = "#ff3333";
+            } else {
+                document.getElementById('status-val').innerText = "NOMINAL"; document.getElementById('status-val').style.color = "#00ff88";
+            }
+        } catch(e) {}
+    }
+    setInterval(syncRealData, 2000);
+
+    let mode = 'global';
+    window.switchView = (m) => {
+        mode = m; document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+m).classList.add('active');
+        addLog(`CAM SWITCH -> ${m.toUpperCase()}`);
+        if(mode === 'global') controls.enabled = true; else controls.enabled = false;
+    };
+
+    let deploying = false;
+    document.getElementById('btn-deploy').onclick = () => { deploying = true; addLog("DEPLOYMENT PULSE INITIATED"); };
+
+    let chunks = []; let recorder;
+    document.getElementById('btn-record').onclick = () => {
+        if(!recorder || recorder.state === 'inactive'){
+            recorder = new MediaRecorder(renderer.domElement.captureStream(60));
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(chunks)); a.download = 'picosat_elite_mission.webm'; a.click();
+                chunks = [];
+            };
+            recorder.start(); addLog("CINEMATIC STREAMING ACTIVE");
+            document.getElementById('record-indicator').style.display = 'block';
+        } else {
+            recorder.stop(); addLog("EXPORTING MISSION CLIP...");
+            document.getElementById('record-indicator').style.display = 'none';
+        }
+    };
+
+    let tick = 0;
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, mainCam));
+    composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.4, 0.85));
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.5); scene.add(sunLight);
+
+    function animate() {
+        requestAnimationFrame(animate); tick += 0.005;
+        earthGroup.rotation.y += 0.0001;
+        sunLight.position.set(500 * Math.cos(tick*0.1), 200, 500 * Math.sin(tick*0.1));
+        const sunDir = sunLight.position.clone().normalize();
+        const satNormal = satGroup.position.clone().normalize();
+        const lightIntensity = Math.max(0, satNormal.dot(sunDir));
+        earthMat.emissiveIntensity = gsap.utils.interpolate(1.5, 0, lightIntensity);
+        
+        // Convert Lat/Lon to 3D Cartesian (Smooth Interpolation)
+        const phi = (90 - realLat) * (Math.PI / 180);
+        const theta = (realLon + 90) * (Math.PI / 180);
+        const R = 100 + (realAlt / 6371) * 100; // Radius mapped to globe scale
+        
+        const targetPos = new THREE.Vector3(
+            -R * Math.sin(phi) * Math.cos(theta),
+            R * Math.cos(phi),
+            R * Math.sin(phi) * Math.sin(theta)
+        );
+        satGroup.position.lerp(targetPos, 0.05);
+        satGroup.rotation.y += 0.01;
+
+        const batt = 100 - (tick % 10); document.getElementById('batt-val').innerText = Math.round(batt) + "%";
+        document.getElementById('battery-fill').style.width = batt + "%";
+
+        const lastPos = satGroup.position.clone();
+        const nextPos = new THREE.Vector3(Math.cos(tick+0.005)*350, Math.sin((tick+0.005)*0.6)*60, Math.sin(tick+0.005)*350);
+        const vel = nextPos.sub(lastPos).multiplyScalar(200);
+        const relVel = vel.dot(satGroup.position.clone().sub(JAKARTA).normalize());
+        const shift = (relVel / C) * F_REF * 1000;
+        document.getElementById('doppler-val').innerText = (shift > 0 ? '+' : '') + shift.toFixed(2) + " kHz";
+
+        if(mode === 'follow'){ mainCam.position.copy(satGroup.position.clone().add(new THREE.Vector3(45,25,45))); mainCam.lookAt(satGroup.position); }
+        else if(mode === 'jakarta'){ mainCam.position.copy(JAKARTA.clone().multiplyScalar(1.02)); mainCam.lookAt(satGroup.position); }
+
+        if(deploying) arms.forEach(p => { if(p.rotation.z > 0) p.rotation.z -= 0.01; });
+        controls.update(); composer.render();
+    }
+    animate();
+</script>
+</body>
+</html>

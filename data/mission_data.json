@@ -1,0 +1,16 @@
+{
+    "frequency_target_mhz": 437.2,
+    "s11_simulated_db": -20.5,
+    "vswr_simulated": 1.2,
+    "gain_dbi": 2.06,
+    "radiation_efficiency": 99.97,
+    "chassis_dim_mm": [
+        50,
+        50,
+        50
+    ],
+    "arm_len_mm": 163.5,
+    "bandwidth_10db_mhz": 38.0,
+    "material": "Beryllium Copper",
+    "velocity_factor": 0.954
+}

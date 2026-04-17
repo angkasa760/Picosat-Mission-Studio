@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+
+# Simulation Data (Include essential pre-computed data)
+live_coords.json
+passes_jakarta.csv
+picosat_beacon.wav
+mission_path.kml
+
+# UI/Media Outputs (Optional to keep, but often excluded for clean code)
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+*.bat
+
+# OS
+.DS_Store
+Thumbs.db

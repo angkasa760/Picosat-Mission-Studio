@@ -1,0 +1,148 @@
+:root {
+    --bg-dark: #0a0e14;
+    --card-bg: rgba(20, 26, 33, 0.95);
+    --primary: #00f2ff;
+    --accent: #ff00ff;
+    --text: #e0e6ed;
+    --green: #00ff88;
+    --red: #ff4444;
+    --border: rgba(0, 242, 255, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #0a0e14 100%);
+    color: var(--text);
+    font-family: 'Roboto Mono', monospace;
+    min-height: 100vh;
+}
+
+header {
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid var(--border);
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: var(--primary);
+}
+
+.status-badge {
+    background: var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--green);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.card h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    border-left: 4px solid var(--primary);
+    padding-left: 10px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-item label {
+    display: block;
+    font-size: 0.7rem;
+    color: #8892b0;
+    margin-bottom: 0.5rem;
+}
+
+.stat-item .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.green-glow { color: var(--green); text-shadow: 0 0 10px var(--green); }
+
+#plotly-chart {
+    height: 400px;
+    width: 100%;
+}
+
+#map {
+    height: 350px;
+    border-radius: 8px;
+    background: #000;
+}
+
+.pass-info {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: var(--border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.calculation-card input {
+    width: 100%;
+    margin: 1rem 0;
+    cursor: pointer;
+}
+
+.result-box {
+    margin-top: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.green-text { color: var(--green); }
+
+footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.7rem;
+    color: #495670;
+}
