@@ -44,6 +44,13 @@ function pollLiveTelemetry() {
                 document.getElementById('adcs-spin').innerText = `${data.tumbling_rate_rpm !== undefined ? data.tumbling_rate_rpm.toFixed(1) : '--'} RPM`;
                 document.getElementById('adcs-fading').innerText = `${data.spin_fading_db !== undefined ? data.spin_fading_db.toFixed(2) : '--'} dB`;
             }
+
+            // IoT Data Reception
+            const iotLog = document.getElementById('iot-log');
+            if(iotLog && data.iot_payload) {
+                const nowStr = new Date().toLocaleTimeString();
+                iotLog.innerHTML = `[${nowStr}] <span style="color: #ffd700;">UPLINK RECV</span>: ${data.iot_payload}<br>` + iotLog.innerHTML;
+            }
         });
 }
 

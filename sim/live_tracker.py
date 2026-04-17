@@ -4,6 +4,7 @@ import time
 import json
 import requests
 import math
+import random
 import numpy as np
 import pandas as pd
 from skyfield.api import load, EarthSatellite, Topos
@@ -151,6 +152,23 @@ def run_live_tracker():
             except Exception as e:
                 pass # Silently fail if schedule is missing
 
+            # --- Space Debris Radar System ---
+            debris_warning = False
+            debris_distance_m = 0.0
+            if random.random() < 0.02: # 2% chance every 10 secs
+                debris_warning = True
+                debris_distance_m = random.uniform(50.0, 4999.0) # 50m to 5km
+            
+            # --- LoRaWAN IoT Gateway ---
+            iot_payload = None
+            lat, lon = subpoint.latitude.degrees, subpoint.longitude.degrees
+            # Geo-fence: roughly covering Indonesia (-11 to +6 Lat, 95 to 141 Lon)
+            if -11.0 <= lat <= 6.0 and 95.0 <= lon <= 141.0:
+                if random.random() < 0.3: # 30% chance to intercept node packet when above Indonesia
+                    sensors = ["Sensor Kebun Garut", "Pelampung Tsunami Selatan Jawa", "Stasiun Cuaca Rinjani", "Moisture Sensor Borneo"]
+                    metrics = [f"Soil Moisture {random.randint(60, 95)}%", f"Wave Height {random.uniform(0.5, 3.5):.1f}m", f"Temp {random.randint(18, 32)}C"]
+                    iot_payload = f"[{random.choice(sensors)}] {random.choice(metrics)}"
+
             # Export
             data = {
                 "name": sat_name, "lat": round(subpoint.latitude.degrees, 4), "lon": round(subpoint.longitude.degrees, 4),
@@ -159,6 +177,8 @@ def run_live_tracker():
                 "next_pass": next_pass, "alt_deg": round(alt_deg, 2),
                 "eps_gen_w": eps_gen_w, "eps_load_w": eps_load_w,
                 "spin_fading_db": round(spin_fading_db, 2), "tumbling_rate_rpm": tumbling_rate_rpm,
+                "debris_warning": debris_warning, "debris_dist": round(debris_distance_m, 1),
+                "iot_payload": iot_payload,
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             with open(LIVE_COORDS_PATH, 'w') as f: json.dump(data, f)
